@@ -1,0 +1,289 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Circles!</title>
+
+<style>
+    body{
+      background-color:#265C5F;
+    }
+    
+    
+</style>
+
+  
+</head>
+<body>
+    
+  <div style="width:1000px;margin:0 auto 0 auto;">
+    <canvas id="canvas" width="1000" height="800"></canvas>
+    hello
+  </div>
+  
+  <!-- Add your site or application content here -->
+  <p>Hello world! This is HTML5 Boilerplate.</p>
+
+  <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+<script type="text/javascript">
+  
+  var ctxd;
+  var running = true;
+  $(document).ready(function(){
+    console.log("this works");
+    canvas = document.getElementById('canvas');
+    var ctx = document.getElementById('canvas').getContext('2d');
+    //ctxd = ctx;
+    //draw(ctx);
+    
+    var xTriggered = 0;
+    $( "body" ).keyup(function( event ) {
+      xTriggered++;
+      var msg = "Handler for .keyup() called " + xTriggered + " time(s).";
+      console.log( msg, "html" );
+      console.log( event );
+      if( event.keyCode == 65)
+      {
+        running = !running;
+        if(running)
+        {
+          run();
+        }
+      }
+    });
+    cir = new circles(ctx);
+    run();
+    
+  });
+  
+  function drawa(ctx)
+  {
+    ctx.clearRect(0,0,$('#canvas').attr('width'),$('#canvas').attr('height')); // clear canvas
+    
+    ctx.fillStyle = 'rgba(0,0,0,0)';
+    drawCircle(ctx,100,100,50);
+  }
+  
+  function drawCircle(ctx,x,y,rad,color)
+  {
+    ctx.strokeStyle = 'rgba(0,0,0,0)';
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x,y,rad,0,Math.PI*2,true); // Outer circle
+    ctx.closePath();
+    ctx.fill();
+     ctx.stroke();
+    /*
+    ctx.moveTo(110,75);
+    ctx.arc(75,75,35,0,Math.PI,false);  // Mouth (clockwise)
+    ctx.moveTo(65,65);
+    ctx.arc(60,65,5,0,Math.PI*2,true);  // Left eye
+    ctx.moveTo(95,65);
+    ctx.arc(90,65,5,0,Math.PI*2,true);  // Right eye
+    
+    ctx.stroke();
+    */
+  }
+  
+  function run()
+  {
+    if(running)
+    {
+      cir.draw();
+      
+      window.requestAnimationFrame(run);
+    }
+  }
+  
+  function hold()
+  {
+    
+  }
+  
+  function circles(context)
+  {
+    
+    this.ctx = context;
+    this.outCol = 'rgba(0,123,127,255)';
+    this.inCol = 'rgba(0,246,255,255)';
+    this.center = [parseInt($('#canvas').attr('width'))/2,parseInt($('#canvas').attr('height'))/2];
+    this.firstSize = 200;
+    
+    this.draw = function()
+    {
+      //this.ctx = $('#canvas')[0];
+      var time = new Date();
+      this.ctx.clearRect(0,0,$('#canvas').attr('width'),$('#canvas').attr('height')); // clear canvas
+      
+      this.ctx.fillStyle = this.inCol;
+      
+      drawCircle(this.ctx,this.center[0],this.center[1],this.firstSize,this.inCol);
+      //drawCircle(this.ctx,100 + (Math.sin(time.getTime()/500)*100),100 + (Math.cos(time.getTime()/500)*100),50,this.outCol);
+      var depth = 4;
+      this.recThreeCircle(time,this.center[0],this.center[1],200*.536,200*.46411,this.outCol,1000,depth);
+      
+      //console.log("hi");
+    }
+    
+    this.recCircle = function(time,x,y,offset,size,color,speed,depth)
+    {
+      alert(depth);
+      if(depth<=0)
+        return;
+      
+      
+      
+      drawCircle(this.ctx,x + (Math.sin((time.getTime()/speed))*offset),y + (Math.cos(time.getTime()/speed)*offset),size,color);
+      drawCircle(this.ctx,x + (Math.sin((time.getTime()/speed)+Math.PI)*offset),y + (Math.cos((time.getTime()/speed)+Math.PI)*offset),size,color);
+      
+      /*
+      if(color == this.inCol)
+      {
+        drawCircle(this.ctx,x + (Math.sin((time.getTime()/speed))*offset),y + (Math.cos(time.getTime()/speed)*offset),size,color);
+        drawCircle(this.ctx,x + (Math.sin((time.getTime()/speed)+Math.PI)*offset),y + (Math.cos((time.getTime()/speed)+Math.PI)*offset),size,color);
+      }
+      else
+      {
+        drawCircle(this.ctx,x + (-Math.sin((time.getTime()/speed))*offset),y + (-Math.cos(time.getTime()/speed)*offset),size,color);
+        drawCircle(this.ctx,x + (-Math.sin((time.getTime()/speed)+Math.PI)*offset),y + (-Math.cos((time.getTime()/speed)+Math.PI)*offset),size,color);
+
+      }*/
+      //nextColor = (depth % 2 == 0)? this.outCol:this.inCol;
+      nextColor = (color == this.inCol)? this.outCol:this.inCol;
+      
+      offsetR = .536;
+      sizeR = .46411;
+      ratio = 2;
+      
+      this.recCircle(time,
+          x + (Math.sin((time.getTime()/speed))*(offset)),
+          y + (Math.cos(time.getTime()/speed)*(offset)),
+          offset/ratio,
+          size/ratio,
+          nextColor,
+          -speed*(.99),
+          depth-1
+          );
+      //nextColor = (depth % 2 == 0)? this.outCol:this.inCol;
+      
+      nextColor = (color == this.inCol)? this.outCol:this.inCol;
+      this.recCircle(time,
+          x + (Math.sin((time.getTime()/speed)+Math.PI)*offset),
+          y + (Math.cos((time.getTime()/speed)+Math.PI)*offset),
+          offset/ratio,
+          size/ratio,
+          nextColor,
+          -speed*(.99),
+          depth-1
+          );
+      
+    }
+    
+    this.recThreeCircle = function(time,x,y,offset,size,color,speed,depth)
+    {
+      alert(depth);
+      if(depth<=0)
+        return;
+      
+      
+      drawCircle(this.ctx,
+              x + (Math.sin((time.getTime()/speed)+((2/3)*Math.PI))*offset),
+              y + (Math.cos((time.getTime()/speed)+((2/3)*Math.PI))*offset),
+              size,
+              color);
+      drawCircle(this.ctx,
+              x + (Math.sin((time.getTime()/speed)+((4/3)*Math.PI))*offset),
+              y + (Math.cos((time.getTime()/speed)+((4/3)*Math.PI))*offset),
+              size,
+              color);
+      drawCircle(this.ctx,
+              x + (Math.sin((time.getTime()/speed)+((6/3)*Math.PI))*offset),
+              y + (Math.cos((time.getTime()/speed)+((6/3)*Math.PI))*offset),
+              size,
+              color);
+      
+      /*
+      drawCircle(this.ctx,
+              x + (Math.sin((time.getTime()/speed)+((2/3)*Math.PI))),
+              y + (Math.cos((time.getTime()/speed)+((2/3)*Math.PI))),
+              size,
+              color);
+      drawCircle(this.ctx,
+              x + (Math.sin((time.getTime()/speed)+((4/3)*Math.PI))),
+              y + (Math.cos((time.getTime()/speed)+((4/3)*Math.PI))),
+              size,
+              color);
+      drawCircle(this.ctx,
+              x + (Math.sin((time.getTime()/speed)+((6/3)*Math.PI))),
+              y + (Math.cos((time.getTime()/speed)+((6/3)*Math.PI))),
+              size,
+              color);
+      */
+      
+      nextColor = (color == this.inCol)? this.outCol:this.inCol;
+      
+      offsetR = .536;
+      sizeR = .46411;
+      
+      ratio = 1/0.595;
+      this.recThreeCircle(time,
+          x + (Math.sin((time.getTime()/speed)+((2/3)*Math.PI))*offset),
+          y + (Math.cos((time.getTime()/speed)+((2/3)*Math.PI))*offset),
+          offset*sizeR,
+          size*sizeR,
+          nextColor,
+          -speed*(.70),
+          depth-1
+          );
+      nextColor = (color == this.inCol)? this.outCol:this.inCol;
+      this.recThreeCircle(time,
+          x + (Math.sin((time.getTime()/speed)+((4/3)*Math.PI))*offset),
+          y + (Math.cos((time.getTime()/speed)+((4/3)*Math.PI))*offset),
+          offset*sizeR,
+          size*sizeR,
+          nextColor,
+          -speed*(.70),
+          depth-1
+          );
+      nextColor = (color == this.inCol)? this.outCol:this.inCol;
+      this.recThreeCircle(time,
+          x + (Math.sin((time.getTime()/speed)+((6/3)*Math.PI))*offset),
+          y + (Math.cos((time.getTime()/speed)+((6/3)*Math.PI))*offset),
+          offset*sizeR,
+          size*sizeR,
+          nextColor,
+          -speed*(.70),
+          depth-1
+          );
+      /*
+      this.recCircle(time,
+          x + (Math.sin((time.getTime()/speed))*(offset)),
+          y + (Math.cos(time.getTime()/speed)*(offset)),
+          offset/ratio,
+          size/ratio,
+          nextColor,
+          -speed*(.99),
+          depth-1
+          );
+      //nextColor = (depth % 2 == 0)? this.outCol:this.inCol;
+      
+      nextColor = (color == this.inCol)? this.outCol:this.inCol;
+      this.recCircle(time,
+          x + (Math.sin((time.getTime()/speed)+Math.PI)*offset),
+          y + (Math.cos((time.getTime()/speed)+Math.PI)*offset),
+          offset/ratio,
+          size/ratio,
+          nextColor,
+          -speed*(.99),
+          depth-1
+          );
+      */
+    }
+    
+  }
+  
+  
+</script>
+</body>
+</html>
